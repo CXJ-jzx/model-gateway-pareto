@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "endpoint-routing-strategy"
+version = "0.3.0"
+description = "Auditable model-endpoint routing and offline experiments"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.setuptools.packages.find]
+include = ["endpoint_routing_strategy*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+endpoint_routing_strategy = ["experiments/configs/*.json"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"

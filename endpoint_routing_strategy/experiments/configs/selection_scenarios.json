@@ -1,0 +1,117 @@
+{
+  "schema_version": "1.0",
+  "synthetic_arrival_time": "2026-10-04T00:00:00+00:00",
+  "request_defaults": {
+    "model_id": "模型BL",
+    "stream_type": "nonstream",
+    "predicted_input_tokens": 100,
+    "predicted_output_tokens": 50,
+    "priority": "normal",
+    "slo": {"e2e_ms": 1000, "ttft_ms": 100, "tpot_ms": 10},
+    "estimated_service_ms": 400,
+    "estimated_ttft_ms": 40
+  },
+  "parameter_defaults": {
+    "cost_mode": "predicted_request",
+    "top_k": 3,
+    "backup_pool": "all_feasible",
+    "min_samples": 1,
+    "target_samples": 1,
+    "prior_strength": 0,
+    "window_candidates_minutes": [5, 15, 60],
+    "half_life_minutes": 30,
+    "lambda_cost": 0.5,
+    "eta_ttft": 0.5,
+    "rho_input_price": 0.5
+  },
+  "snapshot_templates": {
+    "cost_performance": {
+      "endpoints": [
+        {"endpoint_id": "cheap", "price_tiers": [{"input_per_million": 1, "output_per_million": 1}], "observations": [{"e2e_ms": 900, "ttft_ms": 90, "tpot_ms": 9}]},
+        {"endpoint_id": "balanced", "price_tiers": [{"input_per_million": 2, "output_per_million": 2}], "observations": [{"e2e_ms": 250, "ttft_ms": 25, "tpot_ms": 2.5}]},
+        {"endpoint_id": "fast", "price_tiers": [{"input_per_million": 5, "output_per_million": 5}], "observations": [{"e2e_ms": 100, "ttft_ms": 10, "tpot_ms": 1}]},
+        {"endpoint_id": "dominated", "price_tiers": [{"input_per_million": 6, "output_per_million": 6}], "observations": [{"e2e_ms": 800, "ttft_ms": 80, "tpot_ms": 8}]}
+      ]
+    },
+    "stream_tradeoff": {
+      "endpoints": [
+        {"endpoint_id": "first_token_fast", "observations": [{"e2e_ms": 600, "ttft_ms": 10, "tpot_ms": 8}]},
+        {"endpoint_id": "token_generation_fast", "observations": [{"e2e_ms": 300, "ttft_ms": 70, "tpot_ms": 1}]}
+      ]
+    },
+    "price_tradeoff": {
+      "endpoints": [
+        {"endpoint_id": "input_cheap", "price_tiers": [{"input_per_million": 1, "output_per_million": 8}], "observations": [{"e2e_ms": 400}]},
+        {"endpoint_id": "output_cheap", "price_tiers": [{"input_per_million": 6, "output_per_million": 2}], "observations": [{"e2e_ms": 400}]}
+      ]
+    },
+    "prior_only": {
+      "endpoints": [
+        {"endpoint_id": "prior_endpoint", "observations": [], "prior": {"e2e_p95_ms": 300, "ttft_p95_ms": 30, "tpot_proxy_ms": 3}}
+      ]
+    },
+    "recent_degradation": {
+      "endpoints": [
+        {"endpoint_id": "changed", "price_tiers": [{"input_per_million": 1, "output_per_million": 1}], "observations": [{"count": 100, "age_minutes": 30, "e2e_ms": 200}, {"count": 1, "age_minutes": 0, "e2e_ms": 1200}]},
+        {"endpoint_id": "steady", "price_tiers": [{"input_per_million": 2, "output_per_million": 2}], "observations": [{"count": 8, "e2e_ms": 500}]}
+      ]
+    },
+    "stable_backups": {
+      "endpoints": [
+        {"endpoint_id": "primary", "price_tiers": [{"input_per_million": 1, "output_per_million": 1}], "observations": [{"count": 8, "e2e_ms": 100}]},
+        {"endpoint_id": "stable_expensive", "price_tiers": [{"input_per_million": 4, "output_per_million": 4}], "observations": [{"count": 99, "e2e_ms": 500}, {"count": 1, "success": false, "http_status": 500}]},
+        {"endpoint_id": "reliable_second", "price_tiers": [{"input_per_million": 2, "output_per_million": 2}], "observations": [{"count": 95, "e2e_ms": 300}, {"count": 5, "success": false, "http_status": 429}]},
+        {"endpoint_id": "sparse_perfect", "price_tiers": [{"input_per_million": 3, "output_per_million": 3}], "observations": [{"count": 1, "e2e_ms": 400}]}
+      ]
+    },
+    "sparse_vs_many": {
+      "endpoints": [
+        {"endpoint_id": "primary", "price_tiers": [{"input_per_million": 1, "output_per_million": 1}], "observations": [{"count": 8, "e2e_ms": 100}]},
+        {"endpoint_id": "sparse_perfect", "price_tiers": [{"input_per_million": 2, "output_per_million": 2}], "observations": [{"count": 1, "e2e_ms": 300}]},
+        {"endpoint_id": "many_95_percent", "price_tiers": [{"input_per_million": 3, "output_per_million": 3}], "observations": [{"count": 95, "e2e_ms": 500}, {"count": 5, "success": false, "http_status": 500}]}
+      ]
+    },
+    "index_isolation": {
+      "endpoints": [
+        {"endpoint_id": "shared", "observations": [{"e2e_ms": 700, "stream_type": "nonstream"}, {"e2e_ms": 1, "ttft_ms": 1, "tpot_ms": 1, "stream_type": "stream"}, {"e2e_ms": 1, "model_id": "模型BP", "stream_type": "nonstream"}]},
+        {"endpoint_id": "correct_fast", "observations": [{"e2e_ms": 300}]},
+        {"endpoint_id": "other_model_only", "model_id": "模型DC", "price_tiers": [{"input_per_million": 0, "output_per_million": 0}], "observations": [{"e2e_ms": 1}]}
+      ]
+    }
+  },
+  "cases": [
+    {"case_id": "cost_lambda_0", "description": "只重性能；被支配点仍不可进入Pareto选择。", "snapshot_template": "cost_performance", "parameters": {"lambda_cost": 0}},
+    {"case_id": "cost_lambda_half", "description": "成本与性能均衡权重，展示线性评分。", "snapshot_template": "cost_performance"},
+    {"case_id": "cost_lambda_1", "description": "只重本请求预测输入与输出费用，不额外使用ρ修饰账单。", "snapshot_template": "cost_performance", "parameters": {"lambda_cost": 1}},
+    {"case_id": "ttft_weight_0", "description": "流式更重TPOT，但TTFT硬约束仍有效。", "snapshot_template": "stream_tradeoff", "request": {"model_id": "模型BP", "stream_type": "stream"}, "parameters": {"eta_ttft": 0, "lambda_cost": 0}},
+    {"case_id": "ttft_weight_1", "description": "流式更重TTFT，但TPOT硬约束仍有效。", "snapshot_template": "stream_tradeoff", "request": {"model_id": "模型BP", "stream_type": "stream"}, "parameters": {"eta_ttft": 1, "lambda_cost": 0}},
+    {"case_id": "price_rho_0", "description": "显式旧unit_price模式：成本只重输出Token单价，不是预测账单。", "snapshot_template": "price_tradeoff", "request": {"model_id": "模型DC"}, "parameters": {"cost_mode": "unit_price", "rho_input_price": 0}},
+    {"case_id": "price_rho_1", "description": "显式旧unit_price模式：成本只重输入Token单价，不是预测账单。", "snapshot_template": "price_tradeoff", "request": {"model_id": "模型DC"}, "parameters": {"cost_mode": "unit_price", "rho_input_price": 1}},
+    {"case_id": "bl_stream", "description": "模型BL流式独立窗口；低优先级对应宽松SLO，三个模型均覆盖两种模式。", "snapshot_template": "cost_performance", "request": {"stream_type": "stream", "priority": "low", "slo": {"e2e_ms": 2000, "ttft_ms": 200, "tpot_ms": 20}}},
+    {"case_id": "bp_nonstream", "description": "模型BP非流式只用E2E性能。", "snapshot_template": "cost_performance", "request": {"model_id": "模型BP"}},
+    {"case_id": "dc_stream", "description": "模型DC流式综合TTFT和TPOT。", "snapshot_template": "stream_tradeoff", "request": {"model_id": "模型DC", "stream_type": "stream"}},
+    {"case_id": "disabled", "description": "最低价格组合被禁用，不参与选择。", "snapshot_template": "cost_performance", "parameters": {"lambda_cost": 1}, "endpoint_overrides": {"cheap": {"enabled": false}}},
+    {"case_id": "endpoint_unhealthy", "description": "Endpoint整体健康只作为健康筛选，容量仍按model×endpoint。", "snapshot_template": "cost_performance", "parameters": {"lambda_cost": 1}, "endpoint_overrides": {"cheap": {"health_status": "down"}}},
+    {"case_id": "cooldown", "description": "冷却期尚未到期的组合被过滤。", "snapshot_template": "cost_performance", "parameters": {"lambda_cost": 1}, "endpoint_overrides": {"cheap": {"cooldown_remaining_seconds": 30}}},
+    {"case_id": "projected_rpm", "description": "加入本请求后RPM超限，即使当前值尚未达上限也排除。", "snapshot_template": "cost_performance", "parameters": {"lambda_cost": 1}, "endpoint_overrides": {"cheap": {"capacity": {"rpm": 10}, "load": {"current_rpm": 9.5}}}},
+    {"case_id": "projected_tpm", "description": "预测输入+输出Tokens同时参与TPM预留与本请求费用估算，重新计算输入重型画像。", "snapshot_template": "cost_performance", "request": {"predicted_input_tokens": 5000, "predicted_output_tokens": 1000, "estimated_service_ms": 800}, "parameters": {"lambda_cost": 1}, "endpoint_overrides": {"cheap": {"capacity": {"tpm": 10000}, "load": {"current_tpm": 5000}}}},
+    {"case_id": "projected_concurrency", "description": "本请求加入后并发超限；当前并发属于model×endpoint。", "snapshot_template": "cost_performance", "parameters": {"lambda_cost": 1}, "endpoint_overrides": {"cheap": {"capacity": {"concurrency": 3}, "load": {"current_concurrency": 3}}}},
+    {"case_id": "capacity_boundary", "description": "预测加入后恰好等于RPM/TPM/并发上限仍可选择。", "snapshot_template": "cost_performance", "parameters": {"lambda_cost": 1}, "endpoint_overrides": {"cheap": {"capacity": {"rpm": 10, "tpm": 1000, "concurrency": 3}, "load": {"current_rpm": 9, "current_tpm": 850, "current_concurrency": 2}}}},
+    {"case_id": "ttft_slo_even_zero_weight", "description": "eta=0也不能掩盖TTFT超标。", "snapshot_template": "stream_tradeoff", "request": {"model_id": "模型BP", "stream_type": "stream", "slo": {"ttft_ms": 50}}, "parameters": {"eta_ttft": 0, "lambda_cost": 0}},
+    {"case_id": "tpot_slo_even_zero_weight", "description": "eta=1也不能掩盖TPOT超标。", "snapshot_template": "stream_tradeoff", "request": {"model_id": "模型BP", "stream_type": "stream", "slo": {"tpot_ms": 5}}, "parameters": {"eta_ttft": 1, "lambda_cost": 0}},
+    {"case_id": "no_usable_endpoint", "description": "所有候选都违反E2E SLO，返回无可选Endpoint而不是偷偷降级。", "snapshot_template": "cost_performance", "request": {"priority": "high", "slo": {"e2e_ms": 50}, "estimated_service_ms": 40}},
+    {"case_id": "prior_only", "description": "没有近期样本时使用显式历史先验，仍按各项SLO检查。", "snapshot_template": "prior_only", "parameters": {"prior_strength": 30}},
+    {"case_id": "degradation_half_life_short", "description": "短半衰期让近期变慢样本获得更大权重，触发SLO过滤。", "snapshot_template": "recent_degradation", "parameters": {"window_candidates_minutes": [60], "half_life_minutes": 5, "lambda_cost": 1}},
+    {"case_id": "degradation_half_life_long", "description": "长半衰期保留较多旧样本，比较同一状态下的权重影响。", "snapshot_template": "recent_degradation", "parameters": {"window_candidates_minutes": [60], "half_life_minutes": 30, "lambda_cost": 1}},
+    {"case_id": "model_stream_isolation", "description": "其他模型和另一输出模式的快速样本不能污染当前窗口；不遍历全模型。", "snapshot_template": "index_isolation", "parameters": {"lambda_cost": 0}},
+    {"case_id": "deadline_elapsed", "description": "路由发生于到达1200ms后，剩余E2E预算耗尽，不能当作全新预算。", "snapshot_template": "cost_performance", "routing_delay_ms": 1200},
+    {"case_id": "request_input_long", "description": "输入长输出短：交叉单价下优先输入便宜端点，预测长度影响本次费用。", "snapshot_template": "price_tradeoff", "request": {"predicted_input_tokens": 5000, "predicted_output_tokens": 100, "estimated_service_ms": 600}, "parameters": {"lambda_cost": 1}},
+    {"case_id": "request_output_long", "description": "输出长输入短：在同一单价和性能下翻转选择，优先输出便宜端点。", "snapshot_template": "price_tradeoff", "request": {"predicted_input_tokens": 100, "predicted_output_tokens": 5000, "estimated_service_ms": 800}, "parameters": {"lambda_cost": 1}},
+    {"case_id": "top_three_order", "description": "返回首选及至多两个有序备用，首选仍最小Pareto线性分数。", "snapshot_template": "cost_performance"},
+    {"case_id": "stable_dominated_backup", "description": "只有一个二维Pareto首选时，从全部可行点补充更稳定但被成本性能支配的备用。", "snapshot_template": "stable_backups"},
+    {"case_id": "sparse_success_vs_large_sample", "description": "1次100%成功不应比100次95%成功更可靠，备用按保守稳定性代理排序。", "snapshot_template": "sparse_vs_many"},
+    {"case_id": "disabled_backup", "description": "最稳定备用被禁用后不能进入有序列表，其他合硬约束备用补位。", "snapshot_template": "stable_backups", "endpoint_overrides": {"stable_expensive": {"enabled": false}}},
+    {"case_id": "pareto_only_backup_pool", "description": "显式把备用池限制为二维Pareto，只有一个前沿点时不强行凑足三个。", "snapshot_template": "stable_backups", "parameters": {"backup_pool": "pareto"}},
+    {"case_id": "backup_phase_stability_first", "description": "排除已经尝试的首选后，第二阶段按稳定性而不是原始成本性能分数选备用。", "snapshot_template": "stable_backups", "parameters": {"selection_phase": "backup", "exclude_endpoints": ["primary"]}}
+  ]
+}

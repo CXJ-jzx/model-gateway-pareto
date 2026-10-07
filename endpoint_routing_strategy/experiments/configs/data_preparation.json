@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "seed": 20261003,
+  "train_fraction": 0.6,
+  "calibration_fraction": 0.2,
+  "minimum_group_samples": 20,
+  "priority_distribution": {"high": 0.1, "normal": 0.7, "low": 0.2},
+  "priority_to_slo": {"high": "strict", "normal": "standard", "low": "relaxed"},
+  "slo_tiers": {
+    "strict": {"latency_multiplier": 1.5, "queue_fraction": 0.1},
+    "standard": {"latency_multiplier": 2.0, "queue_fraction": 0.2},
+    "relaxed": {"latency_multiplier": 3.0, "queue_fraction": 0.3}
+  },
+  "fallback": {"input_tokens": 1024, "output_tokens": 256, "ttft_ms": 3000, "tpot_ms": 100, "e2e_ms": 30000},
+  "heavy_quantile": 0.9,
+  "heavy_min_input_tokens": 4096,
+  "heavy_min_output_tokens": 512,
+  "urgency": {"critical_slack_fraction": 0.1, "elevated_slack_fraction": 0.3}
+}
