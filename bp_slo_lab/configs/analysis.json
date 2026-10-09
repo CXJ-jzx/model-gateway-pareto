@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "model_id": "模型BP",
+  "minimum_group_samples": 100,
+  "input_bin_upper_bounds": [128, 512, 2048, 8192, 32768, 131072],
+  "output_bin_upper_bounds": [512, 2048, 8192, 32768],
+  "train_fraction": 0.6,
+  "calibration_fraction": 0.2,
+  "display_timezone": "UTC+08:00",
+  "routing_contract": {
+    "candidate_pool": "pareto_frontier_only",
+    "ranking": ["linear_cost_performance_score", "endpoint_id"],
+    "slots": 3,
+    "empty_slot": null,
+    "stability_ranking": false,
+    "variance_in_score": false,
+    "slo_status": "not_yet_calibrated"
+  }
+}

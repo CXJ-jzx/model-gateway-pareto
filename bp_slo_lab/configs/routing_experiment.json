@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "stage": "request_conditioned_routing",
+  "grade": "p95",
+  "lambda_cost": 0.5,
+  "eta_ttft": 0.5,
+  "currency": "CNY",
+  "fx_rates_to_currency": {"CNY": 1.0},
+  "sample_requests_per_group": 3,
+  "performance": {
+    "quantile": 0.95,
+    "window_candidates_minutes": [60, 180, 360, 720, 1440],
+    "half_life_minutes": 180,
+    "target_samples": 40,
+    "minimum_samples": 30,
+    "minimum_effective_samples": 20,
+    "input_index_width_tokens": 128,
+    "output_index_width_tokens": 256,
+    "input_similarity": {"relative": 0.5, "absolute_tokens": 128},
+    "output_similarity": {"relative": 0.25, "absolute_tokens": 50},
+    "metric_features": {"e2e": ["input", "output"], "ttft": ["input"], "tpot": ["input", "output"]}
+  }
+}

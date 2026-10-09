@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "model_id": "模型BP",
+  "stage": "slo_tolerance_only",
+  "purpose": "experiment_example_not_business_commitment",
+  "relative_tolerance": {"e2e": 0.1, "ttft": 0.1, "tpot": 0.1},
+  "absolute_tolerance": {"e2e": 0, "ttft": 0, "tpot": 0},
+  "absolute_units": {"e2e": "ms", "ttft": "ms", "tpot": "ms/token"},
+  "formula": "limit + max(limit * relative_tolerance, absolute_tolerance)"
+}
