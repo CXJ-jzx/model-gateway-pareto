@@ -1,0 +1,23 @@
+{
+  "options": {
+    "config": "/home/ubuntu/litellm-real/config_custom.yaml",
+    "env_file": "/home/ubuntu/litellm-real/real_keys.env",
+    "gateway": "http://127.0.0.1:4000",
+    "model": "deepseek-flash",
+    "suite": "supplier-cost",
+    "pairs_per_cell": 3,
+    "followups": 3,
+    "max_calls": 100,
+    "max_cost": 1.2,
+    "slo_ms": 5000.0,
+    "timeout": 60,
+    "spacing": 1,
+    "cache_wait": 3
+  },
+  "source_sha256": {
+    "routing.py": "8cebe4f013251c151df1c9e3a104e6693d7b37727dd0cbd1a5ea67c4a6a832b4",
+    "experiment.py": "bc599963e637c99b325f28e70671163ca15470bb969a29fde0fdb740706e31c0",
+    "supplier_experiment.py": "f03a4b28c688342a86a2662d1d54863cbf4d71107b002934f6fa1dd4ff92bc35"
+  },
+  "remote_execution": "in_memory_no_service_or_remote_files_modified"
+}
